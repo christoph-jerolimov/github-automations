@@ -1,4 +1,4 @@
-# GitHub automations
+# GitHub automations - cross repo workflows
 
 ## Sync forks with upstream
 
