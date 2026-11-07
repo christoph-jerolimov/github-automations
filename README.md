@@ -9,13 +9,10 @@ default branch of a list of forks to the latest upstream commit, like the
 **Sync fork** button on GitHub.
 
 The forks are kept in sync so that their default branches always contain the
-latest upstream code and can be used with [claude.ai](https://claude.ai), for
-example as sources for Claude Code sessions, without being outdated.
+latest upstream code and can be used with [claude.ai](https://claude.ai) or
+other cloud AI tools.
 
-It runs twice a week, on pull requests, on pushes to `main` and manually.
-
-Forks are listed in the workflow's `matrix.include`. Each entry has the fork,
-its upstream repository and the branch to sync (`main`, or `master` for backstage).
+It runs twice a week.
 
 ### Status
 
