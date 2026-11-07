@@ -4,18 +4,12 @@
 
 [![Sync forks with upstream](https://github.com/christoph-jerolimov/github-automations/actions/workflows/sync-forks.yml/badge.svg)](https://github.com/christoph-jerolimov/github-automations/actions/workflows/sync-forks.yml)
 
-[`.github/workflows/sync-forks.yml`](.github/workflows/sync-forks.yml) fast-forwards the
-default branch of a list of forks to the latest upstream commit, like the
-**Sync fork** button on GitHub.
-
-The forks are kept in sync so that their default branches always contain the
-latest upstream code and can be used with [claude.ai](https://claude.ai) or
-other cloud AI tools.
-
-The sync never force-pushes: if a fork's branch has diverged from upstream the
-job for that fork fails and the other forks are still synced.
-
-It runs twice a week.
+[`.github/workflows/sync-forks.yml`](.github/workflows/sync-forks.yml) fast-forwards
+the default branches of the forks below to the latest upstream commit twice a
+week, like the **Sync fork** button on GitHub, so they can be used with
+[claude.ai](https://claude.ai) or other cloud AI tools. It never force-pushes:
+a fork that has diverged from upstream fails on its own while the others are
+still synced.
 
 ### Status
 
