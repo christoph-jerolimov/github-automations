@@ -1,4 +1,4 @@
-# github-automations
+# GitHub automations
 
 ## Sync forks with upstream
 
