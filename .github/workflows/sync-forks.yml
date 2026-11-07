@@ -2,10 +2,10 @@ name: Sync forks with upstream
 
 on:
   schedule:
-    # Every Monday at 06:00 UTC (07:00 CET / 08:00 CEST)
-    - cron: "0 6 * * 1"
-    # Every Thursday at 18:00 UTC (19:00 CET / 20:00 CEST)
-    - cron: "0 18 * * 4"
+    # Every Monday at 05:57 UTC (06:57 CET / 07:57 CEST)
+    - cron: "57 5 * * 1"
+    # Every Thursday at 17:57 UTC (18:57 CET / 19:57 CEST)
+    - cron: "57 17 * * 4"
   workflow_dispatch:
 
 permissions: {}

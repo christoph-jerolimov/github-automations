@@ -4,8 +4,8 @@
 
 [`.github/workflows/sync-forks.yml`](.github/workflows/sync-forks.yml) fast-forwards the
 default branch of a list of forks to the latest upstream commit, like the
-**Sync fork** button on GitHub. It runs every Monday morning (06:00 UTC) and
-Thursday evening (18:00 UTC), and can also be started manually from the Actions
+**Sync fork** button on GitHub. It runs every Monday morning (05:57 UTC) and
+Thursday evening (17:57 UTC), and can also be started manually from the Actions
 tab (`workflow_dispatch`).
 
 Forks are listed in the workflow's `matrix.include`. Each entry has the fork,
