@@ -12,13 +12,7 @@ The forks are kept in sync so that their default branches always contain the
 latest upstream code and can be used with [claude.ai](https://claude.ai), for
 example as sources for Claude Code sessions, without being outdated.
 
-It runs:
-
-- every Monday morning (05:57 UTC) and Thursday evening (17:57 UTC),
-- on every pull request and on every push to `main` (for example when a pull
-  request is merged), so the status of the current `main` commit is always
-  filled in,
-- manually from the Actions tab (`workflow_dispatch`).
+It runs twice a week, on pull requests, on pushes to `main` and manually.
 
 Forks are listed in the workflow's `matrix.include`. Each entry has the fork,
 its upstream repository and the branch to sync (`main`, or `master` for backstage).
@@ -36,20 +30,6 @@ its upstream repository and the branch to sync (`main`, or `master` for backstag
 | [rhdh-loadtest](https://github.com/christoph-jerolimov/rhdh-loadtest) | [redhat-developer/rhdh-loadtest](https://github.com/redhat-developer/rhdh-loadtest) | [![rhdh-loadtest](https://img.shields.io/github/check-runs/christoph-jerolimov/github-automations/main?nameFilter=christoph-jerolimov%2Frhdh-loadtest%20%28main%29&label=rhdh-loadtest)](https://github.com/christoph-jerolimov/github-automations/actions/workflows/sync-forks.yml) |
 | [rhdh-local](https://github.com/christoph-jerolimov/rhdh-local) | [redhat-developer/rhdh-local](https://github.com/redhat-developer/rhdh-local) | [![rhdh-local](https://img.shields.io/github/check-runs/christoph-jerolimov/github-automations/main?nameFilter=christoph-jerolimov%2Frhdh-local%20%28main%29&label=rhdh-local)](https://github.com/christoph-jerolimov/github-automations/actions/workflows/sync-forks.yml) |
 | [rhdh-e2e-test-utils](https://github.com/christoph-jerolimov/rhdh-e2e-test-utils) | [redhat-developer/rhdh-e2e-test-utils](https://github.com/redhat-developer/rhdh-e2e-test-utils) | [![rhdh-e2e-test-utils](https://img.shields.io/github/check-runs/christoph-jerolimov/github-automations/main?nameFilter=christoph-jerolimov%2Frhdh-e2e-test-utils%20%28main%29&label=rhdh-e2e-test-utils)](https://github.com/christoph-jerolimov/github-automations/actions/workflows/sync-forks.yml) |
-
-- The workflow badge at the top reflects the latest run on the default branch.
-- The per-fork badges are [shields.io check-run badges](https://shields.io/badges/git-hub-branch-check-runs)
-  filtered by the matrix job name (`<fork> (<branch>)`) on the head of `main`.
-  They show `passing`, `failing`, `pending`, or `no check runs` if the workflow
-  has not run yet against the current `main` commit.
-- Each run also sets a commit status per fork (`fork-sync/<fork>`, for example
-  `fork-sync/backstage`) on the commit the workflow ran against: the head of
-  `main` for scheduled, push and manual runs, and the pull request's head
-  commit for pull request runs. It shows as the check mark or cross next to the
-  commit and links to the run.
-- Check runs and statuses belong to a commit. Because every push to `main`
-  triggers a run, the per-fork badges and statuses of the current `main` commit
-  are only briefly empty until that run has finished.
 
 ### Setup
 
