@@ -6,7 +6,13 @@
 
 [`.github/workflows/sync-forks.yml`](.github/workflows/sync-forks.yml) fast-forwards the
 default branch of a list of forks to the latest upstream commit, like the
-**Sync fork** button on GitHub. It runs:
+**Sync fork** button on GitHub.
+
+The forks are kept in sync so that their default branches always contain the
+latest upstream code and can be used with [claude.ai](https://claude.ai), for
+example as sources for Claude Code sessions, without being outdated.
+
+It runs:
 
 - every Monday morning (05:57 UTC) and Thursday evening (17:57 UTC),
 - on every pull request and on every push to `main` (for example when a pull
