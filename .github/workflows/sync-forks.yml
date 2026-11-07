@@ -14,6 +14,9 @@ jobs:
   sync:
     name: ${{ matrix.fork }} (${{ matrix.branch }})
     runs-on: ubuntu-latest
+    permissions:
+      # Needed to set the per-fork commit status on this repository.
+      statuses: write
     strategy:
       fail-fast: false
       matrix:
@@ -30,8 +33,24 @@ jobs:
           - fork: christoph-jerolimov/rhdh-plugins
             upstream: redhat-developer/rhdh-plugins
             branch: main
+    env:
+      FORK: ${{ matrix.fork }}
+      UPSTREAM: ${{ matrix.upstream }}
+      BRANCH: ${{ matrix.branch }}
+      RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
     steps:
+      - name: Set pending commit status
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh api "repos/${{ github.repository }}/statuses/${{ github.sha }}" \
+            -f state=pending \
+            -f context="fork-sync/${FORK##*/}" \
+            -f description="Syncing ${BRANCH} from ${UPSTREAM}…" \
+            -f target_url="${RUN_URL}" > /dev/null
+
       - name: Sync ${{ matrix.branch }} from ${{ matrix.upstream }}
+        id: sync
         env:
           # Fine-grained PAT with "Contents: Read and write" on the forks above.
           # The default GITHUB_TOKEN can only write to this repository.
@@ -43,21 +62,39 @@ jobs:
             exit 1
           fi
 
-          before=$(gh api "repos/${{ matrix.fork }}/branches/${{ matrix.branch }}" --jq .commit.sha)
-          echo "Fork ${{ matrix.fork }}@${{ matrix.branch }} is at ${before}"
+          before=$(gh api "repos/${FORK}/branches/${BRANCH}" --jq .commit.sha)
+          echo "Fork ${FORK}@${BRANCH} is at ${before}"
 
           # Same as the "Sync fork" button on GitHub: fast-forwards the branch
           # from the upstream repository. Fails (without --force) if the fork
           # has diverged, so no history is ever overwritten.
-          gh repo sync "${{ matrix.fork }}" \
-            --source "${{ matrix.upstream }}" \
-            --branch "${{ matrix.branch }}"
+          gh repo sync "${FORK}" --source "${UPSTREAM}" --branch "${BRANCH}"
 
-          after=$(gh api "repos/${{ matrix.fork }}/branches/${{ matrix.branch }}" --jq .commit.sha)
+          after=$(gh api "repos/${FORK}/branches/${BRANCH}" --jq .commit.sha)
           if [ "${before}" = "${after}" ]; then
-            echo "Already up to date."
-            echo "- **${{ matrix.fork }}** \`${{ matrix.branch }}\`: already up to date (\`${after:0:7}\`)" >> "$GITHUB_STEP_SUMMARY"
+            result="Already up to date (${after:0:7})"
+            echo "- **${FORK}** \`${BRANCH}\`: already up to date (\`${after:0:7}\`)" >> "$GITHUB_STEP_SUMMARY"
           else
-            echo "Updated ${before} -> ${after}"
-            echo "- **${{ matrix.fork }}** \`${{ matrix.branch }}\`: \`${before:0:7}\` → \`${after:0:7}\`" >> "$GITHUB_STEP_SUMMARY"
+            result="Updated ${before:0:7} → ${after:0:7}"
+            echo "- **${FORK}** \`${BRANCH}\`: \`${before:0:7}\` → \`${after:0:7}\`" >> "$GITHUB_STEP_SUMMARY"
           fi
+          echo "${result}"
+          echo "result=${result}" >> "$GITHUB_OUTPUT"
+
+      - name: Set final commit status
+        if: always()
+        env:
+          GH_TOKEN: ${{ github.token }}
+          OUTCOME: ${{ steps.sync.outcome }}
+          RESULT: ${{ steps.sync.outputs.result }}
+        run: |
+          case "${OUTCOME}" in
+            success)   state=success; description="${RESULT:-Synced ${BRANCH} from ${UPSTREAM}}" ;;
+            cancelled) state=error;   description="Sync of ${BRANCH} from ${UPSTREAM} was cancelled" ;;
+            *)         state=failure; description="Sync of ${BRANCH} from ${UPSTREAM} failed" ;;
+          esac
+          gh api "repos/${{ github.repository }}/statuses/${{ github.sha }}" \
+            -f state="${state}" \
+            -f context="fork-sync/${FORK##*/}" \
+            -f description="${description}" \
+            -f target_url="${RUN_URL}" > /dev/null
