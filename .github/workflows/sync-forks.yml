@@ -48,12 +48,6 @@ jobs:
           - fork: christoph-jerolimov/rhdh-e2e-test-utils
             upstream: redhat-developer/rhdh-e2e-test-utils
             branch: main
-          - fork: christoph-jerolimov/roadie-backstage-plugins
-            upstream: RoadieHQ/roadie-backstage-plugins
-            branch: main
-          - fork: christoph-jerolimov/immobiliare-gitlab-plugin
-            upstream: immobiliare/backstage-plugin-gitlab
-            branch: main
     env:
       FORK: ${{ matrix.fork }}
       UPSTREAM: ${{ matrix.upstream }}
