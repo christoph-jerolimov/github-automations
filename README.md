@@ -9,9 +9,7 @@ the default branches of the forks below to the latest upstream commit, like the
 **Sync fork** button on GitHub, so they can be used with
 [claude.ai](https://claude.ai) or other cloud AI tools. It never force-pushes,
 so a fork that has diverged from upstream fails on its own while the others are
-still synced.
-
-It runs twice a week.
+still synced. It runs twice a week.
 
 ### Status
 
