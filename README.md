@@ -6,9 +6,13 @@
 
 [`.github/workflows/sync-forks.yml`](.github/workflows/sync-forks.yml) fast-forwards the
 default branch of a list of forks to the latest upstream commit, like the
-**Sync fork** button on GitHub. It runs every Monday morning (05:57 UTC) and
-Thursday evening (17:57 UTC), and can also be started manually from the Actions
-tab (`workflow_dispatch`).
+**Sync fork** button on GitHub. It runs:
+
+- every Monday morning (05:57 UTC) and Thursday evening (17:57 UTC),
+- on every pull request and on every push to `main` (for example when a pull
+  request is merged), so the status of the current `main` commit is always
+  filled in,
+- manually from the Actions tab (`workflow_dispatch`).
 
 Forks are listed in the workflow's `matrix.include`. Each entry has the fork,
 its upstream repository and the branch to sync (`main`, or `master` for backstage).
@@ -33,11 +37,13 @@ its upstream repository and the branch to sync (`main`, or `master` for backstag
   They show `passing`, `failing`, `pending`, or `no check runs` if the workflow
   has not run yet against the current `main` commit.
 - Each run also sets a commit status per fork (`fork-sync/<fork>`, for example
-  `fork-sync/backstage`) on the commit the workflow ran against, normally the
-  head of `main`. It shows as the check mark or cross next to the latest commit
-  and links to the run.
-- Check runs and statuses belong to a commit, so after a new push to `main` the
-  per-fork badges and statuses are empty until the next run.
+  `fork-sync/backstage`) on the commit the workflow ran against: the head of
+  `main` for scheduled, push and manual runs, and the pull request's head
+  commit for pull request runs. It shows as the check mark or cross next to the
+  commit and links to the run.
+- Check runs and statuses belong to a commit. Because every push to `main`
+  triggers a run, the per-fork badges and statuses of the current `main` commit
+  are only briefly empty until that run has finished.
 
 ### Setup
 

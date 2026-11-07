@@ -7,6 +7,10 @@ on:
     # Every Thursday at 17:57 UTC (18:57 CET / 19:57 CEST)
     - cron: "57 17 * * 4"
   workflow_dispatch:
+  pull_request:
+  push:
+    branches:
+      - main
 
 permissions: {}
 
@@ -53,12 +57,16 @@ jobs:
       UPSTREAM: ${{ matrix.upstream }}
       BRANCH: ${{ matrix.branch }}
       RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+      # Commit that receives the status: the PR head for pull_request runs
+      # (github.sha would be the temporary merge commit), otherwise the
+      # commit the run was triggered on (the head of main for scheduled runs).
+      STATUS_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
     steps:
       - name: Set pending commit status
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          gh api "repos/${{ github.repository }}/statuses/${{ github.sha }}" \
+          gh api "repos/${{ github.repository }}/statuses/${STATUS_SHA}" \
             -f state=pending \
             -f context="fork-sync/${FORK##*/}" \
             -f description="Syncing ${BRANCH} from ${UPSTREAM}…" \
@@ -108,7 +116,7 @@ jobs:
             cancelled) state=error;   description="Sync of ${BRANCH} from ${UPSTREAM} was cancelled" ;;
             *)         state=failure; description="Sync of ${BRANCH} from ${UPSTREAM} failed" ;;
           esac
-          gh api "repos/${{ github.repository }}/statuses/${{ github.sha }}" \
+          gh api "repos/${{ github.repository }}/statuses/${STATUS_SHA}" \
             -f state="${state}" \
             -f context="fork-sync/${FORK##*/}" \
             -f description="${description}" \
