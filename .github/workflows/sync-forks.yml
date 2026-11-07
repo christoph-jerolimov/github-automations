@@ -1,0 +1,63 @@
+name: Sync forks with upstream
+
+on:
+  schedule:
+    # Every Monday at 05:57 UTC (06:57 CET / 07:57 CEST)
+    - cron: "57 5 * * 1"
+    # Every Thursday at 17:57 UTC (18:57 CET / 19:57 CEST)
+    - cron: "57 17 * * 4"
+  workflow_dispatch:
+
+permissions: {}
+
+jobs:
+  sync:
+    name: ${{ matrix.fork }} (${{ matrix.branch }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - fork: christoph-jerolimov/backstage
+            upstream: backstage/backstage
+            branch: master
+          - fork: christoph-jerolimov/backstage-community-plugins
+            upstream: backstage/community-plugins
+            branch: main
+          - fork: christoph-jerolimov/rhdh
+            upstream: redhat-developer/rhdh
+            branch: main
+          - fork: christoph-jerolimov/rhdh-plugins
+            upstream: redhat-developer/rhdh-plugins
+            branch: main
+    steps:
+      - name: Sync ${{ matrix.branch }} from ${{ matrix.upstream }}
+        env:
+          # Fine-grained PAT with "Contents: Read and write" on the forks above.
+          # The default GITHUB_TOKEN can only write to this repository.
+          GH_TOKEN: ${{ secrets.FORK_SYNC_TOKEN }}
+        run: |
+          set -euo pipefail
+          if [ -z "${GH_TOKEN}" ]; then
+            echo "::error::Secret FORK_SYNC_TOKEN is not set."
+            exit 1
+          fi
+
+          before=$(gh api "repos/${{ matrix.fork }}/branches/${{ matrix.branch }}" --jq .commit.sha)
+          echo "Fork ${{ matrix.fork }}@${{ matrix.branch }} is at ${before}"
+
+          # Same as the "Sync fork" button on GitHub: fast-forwards the branch
+          # from the upstream repository. Fails (without --force) if the fork
+          # has diverged, so no history is ever overwritten.
+          gh repo sync "${{ matrix.fork }}" \
+            --source "${{ matrix.upstream }}" \
+            --branch "${{ matrix.branch }}"
+
+          after=$(gh api "repos/${{ matrix.fork }}/branches/${{ matrix.branch }}" --jq .commit.sha)
+          if [ "${before}" = "${after}" ]; then
+            echo "Already up to date."
+            echo "- **${{ matrix.fork }}** \`${{ matrix.branch }}\`: already up to date (\`${after:0:7}\`)" >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "Updated ${before} -> ${after}"
+            echo "- **${{ matrix.fork }}** \`${{ matrix.branch }}\`: \`${before:0:7}\` → \`${after:0:7}\`" >> "$GITHUB_STEP_SUMMARY"
+          fi
