@@ -4,6 +4,8 @@ on:
   schedule:
     # Every Monday at 06:00 UTC (07:00 CET / 08:00 CEST)
     - cron: "0 6 * * 1"
+    # Every Thursday at 18:00 UTC (19:00 CET / 20:00 CEST)
+    - cron: "0 18 * * 4"
   workflow_dispatch:
 
 permissions: {}
