@@ -12,6 +12,9 @@ The forks are kept in sync so that their default branches always contain the
 latest upstream code and can be used with [claude.ai](https://claude.ai) or
 other cloud AI tools.
 
+The sync never force-pushes: if a fork's branch has diverged from upstream the
+job for that fork fails and the other forks are still synced.
+
 It runs twice a week.
 
 ### Status
@@ -38,6 +41,3 @@ needs a repository secret named `FORK_SYNC_TOKEN`:
    **Contents: Read and write**.
 2. Add it under *Settings → Secrets and variables → Actions* as an
    **Actions repository secret** named `FORK_SYNC_TOKEN`.
-
-The sync never force-pushes: if a fork's branch has diverged from upstream the
-job for that fork fails and the other forks are still synced.
